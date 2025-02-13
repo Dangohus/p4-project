@@ -1,0 +1,8 @@
+
+monitor_server/inbandtelemetry\.pyc
+
+p4-app/logs/
+
+p4-app/pcaps/
+
+*.pyc

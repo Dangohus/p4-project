@@ -1,0 +1,52 @@
+{
+    "hosts": [
+        "h1",
+        "h2",
+        "h3",
+        "h4"
+    ],
+    "switches": {
+        "s1": {
+          "cli_input" : "s1-commands.txt",
+          "runtime_json" : "s1-runtime.json"
+         },
+        "s2": {
+          "cli_input" : "s2-commands.txt",
+          "runtime_json" : "s2-runtime.json"
+         },
+        "s3": {
+          "cli_input" : "s3-commands.txt",
+          "runtime_json" : "s3-runtime.json"
+         }
+    },
+    "links": [
+        ["h1", "s1"], ["s1", "s2"], ["s1", "s3"],
+        ["s3", "s2"], ["s2", "h2"], ["s3", "h3"],
+        ["h4", "s3"]
+    ],
+    "veths" : {
+        "s3" : {
+          "port" : 3
+        }
+    },
+    "mon_server": {
+          "host" : "h4",
+          "bridge_ip" : "10.0.223.225",
+          "bridge_mac" : "00:00:00:00:22:22",
+          "eth1_intf_ip" : "10.0.223.224",
+          "eth1_intf_mac" : "00:00:00:00:03:05",
+          "mon_intf" : "h4-eth0",
+          "db_gw_intf" : "h4-eth1",
+          "commands" : [
+              "arp -i %s -s %s %s",
+              "arp -i %s -s %s %s",
+              "route add -net %s.0 netmask 255.255.255.0 dev %s",
+              "ifconfig %s 10.0.223.225 netmask 255.255.255.0 broadcast %s.255"
+          ],
+          "root_commands" : [
+              "echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward",
+              "",
+              "echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward"
+          ]
+    }
+}

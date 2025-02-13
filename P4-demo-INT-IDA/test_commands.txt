@@ -1,0 +1,10 @@
+
+
+# host 2:
+iperf3 -s -p 4444 -i 2
+
+# host 1:
+
+iperf3 -u -c 10.0.2.2 -p 4444 -i 1 -b 1M -l 1000
+
+ping 10.0.2.2 -c 50
