@@ -1,0 +1,40 @@
+mysql -u root -p
+CREATE DATABASE intdata;
+USE intdata;
+
+
+CREATE TABLE flows(
+  id INT NOT NULL AUTO_INCREMENT,
+  mon_id VARCHAR(40) NOT NULL,
+  ip_src VARCHAR(20) DEFAULT NULL,
+  ip_dst VARCHAR(20) DEFAULT NULL,
+  ip_proto SMALLINT UNSIGNED DEFAULT NULL,
+  port_src SMALLINT UNSIGNED DEFAULT NULL,
+  port_dst SMALLINT UNSIGNED DEFAULT NULL,
+  instruction_mask_0003 SMALLINT UNSIGNED DEFAULT NULL,
+  instruction_mask_0407 SMALLINT UNSIGNED DEFAULT NULL,
+  UNIQUE KEY `category_UNIQUE` (`mon_id`),
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE demo_data(
+  id INT NOT NULL AUTO_INCREMENT,
+  mon_id VARCHAR(40) NOT NULL,
+  inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  switch_id INT UNSIGNED DEFAULT NULL,
+  l1_ingress_port_id INT UNSIGNED DEFAULT NULL,
+  l1_egress_port_id INT UNSIGNED DEFAULT NULL,
+  hop_latency INT UNSIGNED DEFAULT NULL,
+  q_id INT UNSIGNED DEFAULT NULL,
+  q_occupancy INT UNSIGNED DEFAULT NULL,
+  ingress_global_timestamp INT UNSIGNED DEFAULT NULL,
+  egress_global_timestamp INT UNSIGNED DEFAULT NULL,
+  l2_ingress_port_id INT UNSIGNED DEFAULT NULL,
+  l2_egress_port_id INT UNSIGNED DEFAULT NULL,
+  egress_port_tx_util INT UNSIGNED DEFAULT NULL,
+  PRIMARY KEY(id),
+  FOREIGN KEY (mon_id) REFERENCES flows(mon_id)
+);
+
+#INSERT INTO flows(mon_id, ip_src, ip_dst) VALUES(UUID(), '10.0.1.1', '10.0.2.2');
+ALTER TABLE flows ADD ip_proto SMALLINT UNSIGNED DEFAULT NULL AFTER ip_dst;

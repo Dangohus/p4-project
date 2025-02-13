@@ -1,0 +1,54 @@
+#Commands to make h4 to root DB connection work
+
+#Config in root namespace (Host PC):
+sudo ip tuntap add tap-root mode tap
+sudo ip link set tap-root up
+sudo ip link add br-root type bridge
+sudo ip link set tap-root master br-root
+sudo ip link set root-eth0 master br-root
+sudo ip addr add 10.0.223.225/24 broadcast 10.0.223.255 dev br-root
+sudo ip link set br-root up
+
+#Config when mininet is taken down (Host PC):
+sudo ip link set root-eth0 nomaster
+sudo ip link set tap-root nomaster
+sudo ip link set br-root down
+sudo ip link set tap-root down
+sudo ip link delete tap-root
+sudo ip link delete br-root type bridge
+
+
+#Config in h4 xterm:
+# ARP to bound 10.0.223.225 to its MAC address.
+# Might not be necessary, just to ping back and forth
+arp -i h4-eth1 -s 10.0.223.225 b6:3d:da:45:6c:aa # bridge MAC
+# ARP register to bound 10.0.222.4 to its IP
+arp -i h4-eth1 -s 10.0.222.4 08:00:27:e8:bf:1b # eth0 mac
+# config h4-eth1 ip
+ip link set h4-eth1 address 00:00:00:00:03:05
+ifconfig h4-eth1 10.0.223.224 netmask 255.255.255.0 broadcast 10.0.223.255
+# add route so h4-eth1 send traffic to 10.0.222.4 through h4-eth1
+route add -net 10.0.222.0 netmask 255.255.255.0 dev h4-eth1
+
+
+
+
+#Extra commands not int_hop_cnt_exceeded
+#sudo brctl addbr mybridge
+#sudo brctl addif mybridge eth0
+#sudo brctl addif mybridge root-eth0
+#brctl show
+#sudo brctl delbr mybridge
+#sudo iptables -t nat -v -L -n --line-number
+#sudo iptables -t nat -D POSTROUTING
+#sudo iptables -t nat -F
+#sudo iptables -t nat -v -L -n --line-number
+
+sudo ip tuntap add tap-root mode tap
+sudo ip link set tap-root up
+sudo ip link add br-root type bridge
+sudo ip link set root-eth0 master br-root
+sudo ip link set tap-root master br-root
+sudo ip link set br-root address 00:00:00:00:22:22
+sudo ip addr add 10.0.223.225/24 dev br-root
+sudo ip link set br-root up

@@ -1,0 +1,140 @@
+{
+  "target": "bmv2",
+  "p4info": "build/switch-int.p4.p4info.txt",
+  "bmv2_json": "build/switch-int.json",
+  "table_entries": [
+    {
+      "table": "IngressImpl.int_ingress.tb_set_first_hop",
+      "match": {
+        "standard_metadata.ingress_port": 1
+      },
+      "action_name": "IngressImpl.int_ingress.int_set_first_hop",
+      "action_params": {}
+    },
+    {
+      "table": "IngressImpl.int_ingress.tb_monitor_flow",
+      "match": {
+        "hdr.ipv4.srcAddr": ["10.0.1.1", 4294967295],
+        "hdr.udp.dstPort": [4444, 65535]
+      },
+      "priority" : 2,
+      "action_name": "int_monitor_flow",
+      "action_params": {}
+    },
+    {
+      "table": "IngressImpl.int_ingress.tb_monitor_flow",
+      "match": {
+        "hdr.ipv4.srcAddr": ["10.0.1.1", 4294967295],
+        "hdr.ipv4.dstAddr": ["10.0.2.2", 4294967295],
+        "hdr.ipv4.protocol": [1, 255],
+        "hdr.icmp.tp" : [8, 255]
+      },
+      "priority" : 2,
+      "action_name": "int_monitor_flow",
+      "action_params": {}
+    },
+    {
+      "table": "IngressImpl.table0_control.table0",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.1.1", 4294967295]
+      },
+      "priority" : 2,
+      "action_name": "IngressImpl.table0_control.set_egress_port",
+      "action_params": {
+        "dstAddr": "00:00:00:00:01:01",
+        "port": 1
+      }
+    },
+    {
+      "table": "IngressImpl.table0_control.table0",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.2.2", 4294967295]
+      },
+      "priority" : 2,
+      "action_name": "IngressImpl.table0_control.set_egress_port",
+      "action_params": {
+        "dstAddr": "00:00:00:02:01:00",
+        "port": 2
+      }
+    },
+    {
+      "table": "IngressImpl.table0_control.table0",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.3.3", 4294967295]
+      },
+      "priority" : 2,
+      "action_name": "IngressImpl.table0_control.set_egress_port",
+      "action_params": {
+        "dstAddr": "00:00:00:03:01:00",
+        "port": 3
+      }
+    },
+    {
+      "table": "IngressImpl.table0_control.table0",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.3.4", 4294967295]
+      },
+      "priority" : 2,
+      "action_name": "IngressImpl.table0_control.set_egress_port",
+      "action_params": {
+        "dstAddr": "00:00:00:03:01:00",
+        "port": 3
+      }
+    },
+    {
+      "table": "IngressImpl.table0_control.table0",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.223.2", 4294967295]
+      },
+      "priority" : 2,
+      "action_name": "IngressImpl.table0_control.set_egress_port",
+      "action_params": {
+        "dstAddr": "00:00:00:03:01:00",
+        "port": 3
+      }
+    },
+    {
+      "table": "IngressImpl.int_ingress.tb_set_last_hop",
+      "match": {
+        "standard_metadata.egress_spec": 1
+      },
+      "action_name": "IngressImpl.int_ingress.int_set_last_hop",
+      "action_params": {}
+    },
+    {
+      "table": "EgressImpl.int_egress.int_source_sink.tb_int_first_hop",
+      "match": { },
+      "action_name": "EgressImpl.int_egress.int_source_sink.int_first_hop",
+      "action_params": {
+        "remaining_hop_cnt": 50,
+        "hop_metadata_len": 2,
+        "ins_mask0003": 10,
+        "ins_mask0407": 0,
+        "ins_mask1215": 0
+      }
+    },
+    {
+      "table": "EgressImpl.int_egress.int_transit.tb_int_transit",
+      "match": { },
+      "action_name": "EgressImpl.int_egress.int_transit.int_transit_params",
+      "action_params": {
+        "switch_id": 1,
+        "l3_mtu": 1500
+      }
+    },
+    {
+      "table": "EgressImpl.int_egress.int_report.tb_generate_report",
+      "match": {
+        "standard_metadata.instance_type": 1
+      },
+      "action_name": "EgressImpl.int_egress.int_report.create_int_report",
+      "action_params": {
+        "src_mac": "00:00:00:01:00:00",
+        "mon_server_mac": "00:00:00:00:22:32",
+        "src_ip": "10.0.1.254",
+        "mon_server_ip": "10.0.223.2",
+        "mon_server_port": 12345
+      }
+    }
+  ]
+}

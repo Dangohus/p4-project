@@ -1,0 +1,40 @@
+
+
+xterm h1 h2 h4
+
+Terminator =
+One for wireshark,
+  student@p4:~$ sudo wireshark
+one for mininet,
+  student@p4:~/P4-demo-INT-IDA/p4-app$ make
+one for process listening for reports and
+  student@p4:~/P4-demo-INT-IDA/p4-app/workdir/h4$ sudo python collector.py
+one for mysql prompt:
+  use intdata
+  SET FOREIGN_KEY_CHECKS = 0;
+  TRUNCATE intdata.flows;
+
+MySQL Workbench:
+  SELECT * FROM intdata.flows;
+
+  SELECT *
+  FROM intdata.demo_data
+  WHERE switch_id = 1
+  ORDER BY
+    id
+  DESC LIMIT 10
+
+  SELECT
+    mon_id as "Monitoring ID",
+    ip_src as "Source IP",
+    ip_dst as "Destination IP",
+    port_src as "Source port",
+    port_dst as "Destination Port",
+    instruction_mask_0003 as "Instruction 1",
+    instruction_mask_0407 as "Instruction 2"
+  FROM flows
+  ORDER BY id DESC;demo_datademo_data
+
+Grafana:
+  http://localhost:3000/d/Q8dEfUAiz/demo-udp?refresh=5s&panelId=2&fullscreen&edit&orgId=1&tab=display
+  http://localhost:3000/d/L-fhsrAmk/demo-icmp?refresh=5s&orgId=1

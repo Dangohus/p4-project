@@ -1,0 +1,2 @@
+mirroring_add 500 2
+table_add IngressImpl.int_ingress.tb_set_first_hop IngressImpl.int_ingress.int_set_first_hop 5 0
