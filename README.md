@@ -76,8 +76,9 @@ pip3 install bcc
 ### Rebuild kernel to allow headers
 This is necessary to run bcc
 
-Install cpio prior to kernel rebuild
+Install cpio and gedit prior to kernel rebuild
 `sudo apt install cpio `
+`sudo apt install gedit`
 
 Do the following until and includig step 12.
 Skip step 13 and test if it works with step 14 in folder p4-project/test xdp
