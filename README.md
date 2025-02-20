@@ -79,4 +79,6 @@ This is necessary to run bcc
 Install cpio prior to kernel rebuild
 `sudo apt install cpio `
 
+Do the following until and includig step 12.
+Skip step 13 and test if it works with step 14 in folder p4-project/test xdp
 Kernel rebuild guide https://massoudasadiblog.blogspot.com/2024/07/ebpf-on-wsl2-kernel-version-6x-ubuntu.html?m=1
