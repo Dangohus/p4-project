@@ -73,4 +73,10 @@ pip3 install bcc
 pip3 install bcc
 ```
 
+### Rebuild kernel to allow headers
+This is necessary to run bcc
+
+Install cpio prior to kernel rebuild
+`sudo apt install cpio `
+
 Kernel rebuild guide https://massoudasadiblog.blogspot.com/2024/07/ebpf-on-wsl2-kernel-version-6x-ubuntu.html?m=1
