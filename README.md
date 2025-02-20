@@ -42,7 +42,7 @@ OPTIONAL. Use influxdb to check if BPF works
 sudo curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
 sudo echo "deb https://repos.influxdata.com/ubuntu bionic stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
 sudo apt update
-sudo apt install influxdb`
+sudo apt install influxdb
 ```
 check if it works
 ```
@@ -52,3 +52,25 @@ sudo systemctl enable --now influxdb
 sudo systemctl is-enabled influxdb
 sudo systemctl status influxdb
 ```
+Test connection
+```
+sudo pip install influxdb
+
+cd ~/BPFCollector
+sudo pip install pytest
+sudo python3 -m pytest 
+```
+
+
+packages to intall:
+```
+pip3 install bcc
+pip3 install numba
+pip3 install pytest
+pip3 install bcc
+pip3 install bcc
+pip3 install bcc
+pip3 install bcc
+```
+
+Kernel rebuild guide https://massoudasadiblog.blogspot.com/2024/07/ebpf-on-wsl2-kernel-version-6x-ubuntu.html?m=1
