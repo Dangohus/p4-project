@@ -83,3 +83,8 @@ Install cpio and gedit prior to kernel rebuild
 Do the following until and includig step 12.
 Skip step 13 and test if it works with step 14 in folder p4-project/test xdp
 Kernel rebuild guide https://massoudasadiblog.blogspot.com/2024/07/ebpf-on-wsl2-kernel-version-6x-ubuntu.html?m=1
+
+#### Dissable large recieve offload
+Step 16 may fail with "operation not supported". Then use the following
+`sudo ethtool -K eth0 lro off`
+(source) https://github.com/torvalds/linux/commit/f600b690501550b94e83e07295d9c8b9c4c39f4e
