@@ -108,6 +108,24 @@ curl -fsSL https://repos.influxdata.com/influxdata-archive_compat.key | \
    sudo tee  /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg > /dev/null
 ```
 
+We want to change the port of Prometheus, since P4 uses 9090 for a few things.
+```
+cd /usr/lib/systemd/system
+sudo nano prometheus.service 
+```
+Change exec start to the following
+```
+ExecStart=/usr/bin/prometheus  \
+  --config.file=/etc/prometheus/prometheus.yml \
+  --web.listen-address=0.0.0.0:9091
+```
+Then rebuild and check the status
+```
+sudo systemctl daemon-reload
+sudo systemctl restart prometheus
+sudo systemctl status prometheus
+```
+
 ## Installing Grafana
 Continuing [the lab guide](https://medium.com/btech-engineering/lab-p4-int-in-band-network-telemetry-using-onos-and-ebpf-a84f7649255) on part two of the monitoring section 4.
 ```
