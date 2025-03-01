@@ -5,7 +5,7 @@ LOG_DIR = logs
 
 P4C = p4c-bm2-ss
 P4C_ARGS += --p4runtime-files $(BUILD_DIR)/$(basename $@).p4.p4info.txtpb
-TEMP = /home/nyhus/p4-guide/bin:/home/nyhus/behavioral-model/tools:/usr/local/bin:/home/nyhus/p4dev-python-venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib
+TEMP = $(shell echo $$PATH | tr ':' '\n' | grep -v '/mnt' | paste -sd: -)
 
 RUN_SCRIPT = ../../utils/run_exercise.py
 

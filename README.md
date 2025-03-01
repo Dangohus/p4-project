@@ -1,6 +1,6 @@
 # p4-project
 
-### Setup P4 in WSL
+## Setup P4 in WSL
 run "git clone https://github.com/jafingerhut/p4-guide"
 run "./p4-guide/bin/install-p4dev-v8.sh |& tee log.txt"
 open ".bashrc" located in "home/*user"
@@ -12,7 +12,7 @@ open "MAKEFILE"
 replace all "PATH" with the copied path variables
 
 
-### Installing eBPF locally
+## Installing eBPF locally
 Sourced from [the lab guide](https://medium.com/btech-engineering/lab-p4-int-in-band-network-telemetry-using-onos-and-ebpf-a84f7649255)
 part 5 and forward, but changed siginificantly for modern versions.
 
@@ -88,3 +88,42 @@ Kernel rebuild guide https://massoudasadiblog.blogspot.com/2024/07/ebpf-on-wsl2-
 Step 16 may fail with "operation not supported". Then use the following
 `sudo ethtool -K eth0 lro off`
 (source) https://github.com/torvalds/linux/commit/f600b690501550b94e83e07295d9c8b9c4c39f4e
+
+## Installing Prometheus
+Continuing [the lab guide](https://medium.com/btech-engineering/lab-p4-int-in-band-network-telemetry-using-onos-and-ebpf-a84f7649255) on part two of the monitoring section
+```
+cd ~
+pip install prometheus-client
+wget https://s3-eu-west-1.amazonaws.com/deb.robustperception.io/41EFC99D.gpg | sudo apt-key add -
+sudo apt update
+sudo apt -y install prometheus
+sudo systemctl start prometheus
+sudo systemctl enable prometheus
+sudo systemctl status prometheus
+```
+Influx db might trow errors on `sudo apt update` "E: The repository 'https://repos.influxdata.com/ubuntu bionic InRelease' is not signed." Then use 
+```
+curl -fsSL https://repos.influxdata.com/influxdata-archive_compat.key | \
+   gpg --dearmor | \
+   sudo tee  /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg > /dev/null
+```
+
+## Installing Grafana
+Continuing [the lab guide](https://medium.com/btech-engineering/lab-p4-int-in-band-network-telemetry-using-onos-and-ebpf-a84f7649255) on part two of the monitoring section 4.
+```
+nano grafana.sh
+sudo apt-get install gnupg2 curl software-properties-common -y
+curl https://packages.grafana.com/gpg.key | sudo apt-key add -
+sudo add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
+sudo apt-get update -y
+sudo apt-get install grafana -y
+sudo systemctl daemon-reload
+sudo systemctl enable grafana-server
+sudo systemctl start grafana-server
+sudo systemctl status grafana-server
+```
+
+Open Grafana on localhost:3000 and login with admin/admin
+Go to Connections -> Data sources and add the Prometheus data source.
+In Connection/Prometheus server URL write `http://localhost:9090`.
+Use "Save and Test" in the bottom to check it works.
