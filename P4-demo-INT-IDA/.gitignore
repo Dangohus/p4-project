@@ -6,3 +6,5 @@ p4-app/logs/
 p4-app/pcaps/
 
 *.pyc
+
+/p4-app/build/
