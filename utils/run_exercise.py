@@ -28,7 +28,7 @@ from time import sleep
 
 import p4runtime_lib.simple_controller
 from mininet.cli import CLI
-from mininet.link import TCLink
+from mininet.link import TCLink, Intf
 from mininet.net import Mininet
 from mininet.topo import Topo
 from p4_mininet import P4Host, P4Switch
@@ -197,6 +197,7 @@ class ExerciseRunner:
         """
         # Initialize mininet with the topology specified by the config
         self.create_network()
+        collectorIntf = Intf( 'veth_1', node=self.net.nameToNode[ "s3" ] )
         self.net.start()
         sleep(1)
 

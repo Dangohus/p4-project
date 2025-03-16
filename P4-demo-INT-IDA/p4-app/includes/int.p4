@@ -274,7 +274,10 @@ control Int_source_sink(inout headers_t hdr,
     }
 
     table tb_int_first_hop {
-        key = {}
+        // key = {}
+        key = {
+             hdr.int_meta.ver: exact;
+        }
         actions = {
             int_first_hop;
         }
@@ -648,7 +651,10 @@ control Int_transit(inout headers_t hdr,
     }
 
     table tb_int_transit {
-        key = {}
+        // key = {}
+        key = {
+             hdr.int_meta.ver: exact;
+        }
         actions = {
             int_transit_params;
         }
