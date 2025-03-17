@@ -105,7 +105,7 @@
     {
       "table": "EgressImpl.int_egress.int_source_sink.tb_int_first_hop",
       "match": {
-        "hdr.int_meta.ver": 1
+        "meta.int_metadata.first_hop": 1
       },
       "action_name": "EgressImpl.int_egress.int_source_sink.int_first_hop",
       "action_params": {
@@ -119,7 +119,7 @@
     {
       "table": "EgressImpl.int_egress.int_transit.tb_int_transit",
       "match": {
-        "hdr.int_meta.ver": 1
+        "hdr.int_meta.instruction_mask_0811": 15
       },
       "action_name": "EgressImpl.int_egress.int_transit.int_transit_params",
       "action_params": {
