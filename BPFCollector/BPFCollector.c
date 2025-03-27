@@ -368,13 +368,13 @@ int collector(struct xdp_md *ctx) {
 
     // Eder removed this, and it worked to reduced complexity.
     if (unlikely(ntohs(eth->type) != ETHTYPE_IP))
-       return XDP_PASS;
+        return XDP_PASS;
     struct iphdr *ip;
     CURSOR_ADVANCE(ip, cursor, sizeof(*ip), data_end);
 
     // Eder removed this, and it worked to reduced complexity.
     if (unlikely(ip->protocol != IPPROTO_UDP))
-       return XDP_PASS;
+        return XDP_PASS;
     struct udphdr *udp;
     CURSOR_ADVANCE(udp, cursor, sizeof(*udp), data_end);
 
@@ -459,39 +459,39 @@ int collector(struct xdp_md *ctx) {
         CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
         flow_info.sw_ids[i] = ntohl(*INT_data);
 
-        if (is_in_e_port_ids) {
+        // if (is_in_e_port_ids) {
             CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
             flow_info.in_port_ids[i] = (ntohl(*INT_data) >> 16) & 0xffff;
             flow_info.e_port_ids[i] = ntohl(*INT_data) & 0xffff;
-        }
+        // }
         // Keep this. it's important
-        if (is_hop_latencies) {
+        // if (is_hop_latencies) {
             CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
             flow_info.hop_latencies[i] = ntohl(*INT_data);
             flow_info.flow_latency += flow_info.hop_latencies[i];
-        }
+        // }
         // Keep this. it's important
-        if (is_queue_occups) {
+        // if (is_queue_occups) {
             CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
             flow_info.queue_ids[i] = (ntohl(*INT_data) >> 16) & 0xffff;
             flow_info.queue_occups[i] = ntohl(*INT_data) & 0xffff;
-        }
-        if (is_ingr_times) {
+        // }
+        // if (is_ingr_times) {
             CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
             flow_info.ingr_times[i] = ntohl(*INT_data);
-        }
-        if (is_egr_times) {
+        // }
+        // if (is_egr_times) {
             CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
             flow_info.egr_times[i] = ntohl(*INT_data);
-        }
-        if (is_lv2_in_e_port_ids) {
+        // }
+        // if (is_lv2_in_e_port_ids) {
             CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
             flow_info.lv2_in_e_port_ids[i] = ntohl(*INT_data);
-        }
-        if (is_tx_utilizes) {
+        // }
+        // if (is_tx_utilizes) {
             CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
             flow_info.tx_utilizes[i] = ntohl(*INT_data);
-        }
+        // }
 
         // no need for the final round
         if (i < MAX_INT_HOP - 1) {
