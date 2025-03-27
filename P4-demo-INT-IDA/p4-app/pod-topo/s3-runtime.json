@@ -1,11 +1,13 @@
 {
   "target": "bmv2",
-  "p4info": "build/switch-int.p4.p4info.txt",
+  "p4info": "build/switch-int.p4.p4info.txtpb",
   "bmv2_json": "build/switch-int.json",
   "table_entries": [
     {
       "table": "EgressImpl.int_egress.int_source_sink.tb_int_first_hop",
-      "match": { },
+      "match": {
+        "meta.int_metadata.first_hop": 1
+      },
       "action_name": "EgressImpl.int_egress.int_source_sink.int_first_hop",
       "action_params": {
         "remaining_hop_cnt": 50,
@@ -17,7 +19,9 @@
     },
     {
       "table": "EgressImpl.int_egress.int_transit.tb_int_transit",
-      "match": { },
+      "match": {
+        "hdr.int_meta.instruction_mask_0811": 15
+      },
       "action_name": "EgressImpl.int_egress.int_transit.int_transit_params",
       "action_params": {
         "switch_id": 3,
