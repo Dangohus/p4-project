@@ -39,7 +39,7 @@ cdef struct Event:
 class InDBCollector(object):
     """docstring for InDBCollector"""
 
-    def __init__(self, max_int_hop=6, debug_mode=0, int_dst_port=54321, int_time=False,
+    def __init__(self, max_int_hop=6, debug_mode=0, int_dst_port=12345, int_time=False,
                     host="localhost", database="INTdatabase",event_mode="THRESHOLD"):
         super(InDBCollector, self).__init__()
 
@@ -100,6 +100,7 @@ class InDBCollector(object):
 
     def poll_events(self):
         self.bpf_collector.kprobe_poll()
+        print("abc")
 
     def open_events(self):
         def _process_event(ctx, data, size):

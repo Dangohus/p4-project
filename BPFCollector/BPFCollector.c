@@ -352,7 +352,7 @@ BPF_TABLE("lru_hash", struct queue_id_t, struct queue_info_t, tb_queue, 3000);
 
 int collector(struct xdp_md *ctx) {
 
-    // bpf_trace_printk("recv pkt! \n");
+    bpf_trace_printk("recv pkt!AaAA \n");
 
     // return XDP_DROP;
 
@@ -405,14 +405,14 @@ int collector(struct xdp_md *ctx) {
     CURSOR_ADVANCE_NO_PARSE(cursor, remain_size, data_end);
 
     // CURSOR_ADVANCE_NO_PARSE(cursor, INT_SHIM_SIZE, data_end);
-
+    bpf_trace_printk("00");
     struct INT_shim_v10_t *INT_shim;
     CURSOR_ADVANCE(INT_shim, cursor, sizeof(*INT_shim), data_end);
-
+    bpf_trace_printk("01");
     // struct INT_md_fix_t *INT_md_fix;
     struct INT_md_fix_v10_t *INT_md_fix;
     CURSOR_ADVANCE(INT_md_fix, cursor, sizeof(*INT_md_fix), data_end);
-
+    bpf_trace_printk("%x", INT_shim);
 
     /*
         Parse INT data
@@ -428,7 +428,7 @@ int collector(struct xdp_md *ctx) {
     else if((u8)(INT_md_fix->hopMlen << 1) == INT_data_len)                       num_INT_hop = 2;
     else if(INT_md_fix->hopMlen == INT_data_len)                                  num_INT_hop = 1;
     else if(0 == INT_data_len)                                                    num_INT_hop = 0;
-
+    bpf_trace_printk("A");
     struct flow_info_t flow_info = {
         .src_ip = ntohl(in_ip->saddr),
         .dst_ip = ntohl(in_ip->daddr),
@@ -442,7 +442,7 @@ int collector(struct xdp_md *ctx) {
 
     u16 INT_ins = ntohs(INT_md_fix->ins);
     // Assume that sw_id is alway presented.
-    if ((INT_ins >> 15) & 0x01 != 1) return XDP_DROP;
+    // if ((INT_ins >> 15) & 0x01 != 1) return XDP_DROP;
 
     u8 is_in_e_port_ids  = (INT_ins >> 14) & 0x1;
     u8 is_hop_latencies  = (INT_ins >> 13) & 0x1;
@@ -456,19 +456,20 @@ int collector(struct xdp_md *ctx) {
     u8 _num_INT_hop = num_INT_hop;
     #pragma unroll
     for (u8 i = 0; i < MAX_INT_HOP; i++) {
+        bpf_trace_printk("%x", INT_ins);
         CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
         flow_info.sw_ids[i] = ntohl(*INT_data);
 
         // if (is_in_e_port_ids) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.in_port_ids[i] = (ntohl(*INT_data) >> 16) & 0xffff;
-            flow_info.e_port_ids[i] = ntohl(*INT_data) & 0xffff;
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.in_port_ids[i] = (ntohl(*INT_data) >> 16) & 0xffff;
+            // flow_info.e_port_ids[i] = ntohl(*INT_data) & 0xffff;
         // }
         // Keep this. it's important
         // if (is_hop_latencies) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.hop_latencies[i] = ntohl(*INT_data);
-            flow_info.flow_latency += flow_info.hop_latencies[i];
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.hop_latencies[i] = ntohl(*INT_data);
+            // flow_info.flow_latency += flow_info.hop_latencies[i];
         // }
         // Keep this. it's important
         // if (is_queue_occups) {
@@ -477,20 +478,20 @@ int collector(struct xdp_md *ctx) {
             flow_info.queue_occups[i] = ntohl(*INT_data) & 0xffff;
         // }
         // if (is_ingr_times) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.ingr_times[i] = ntohl(*INT_data);
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.ingr_times[i] = ntohl(*INT_data);
         // }
         // if (is_egr_times) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.egr_times[i] = ntohl(*INT_data);
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.egr_times[i] = ntohl(*INT_data);
         // }
         // if (is_lv2_in_e_port_ids) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.lv2_in_e_port_ids[i] = ntohl(*INT_data);
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.lv2_in_e_port_ids[i] = ntohl(*INT_data);
         // }
         // if (is_tx_utilizes) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.tx_utilizes[i] = ntohl(*INT_data);
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.tx_utilizes[i] = ntohl(*INT_data);
         // }
 
         // no need for the final round
@@ -518,7 +519,7 @@ int collector(struct xdp_md *ctx) {
     flow_id.src_port = flow_info.src_port;
     flow_id.dst_port = flow_info.dst_port;
     flow_id.ip_proto = flow_info.ip_proto;
-
+    bpf_trace_printk("C");
     struct flow_info_t *flow_info_p = tb_flow.lookup(&flow_id);
     if (unlikely(!flow_info_p)) {
 
@@ -546,6 +547,7 @@ int collector(struct xdp_md *ctx) {
     } else {
 
 #ifdef USE_INTERVAL
+        bpf_trace_printk("D");
         if (flow_info_p->flow_sink_time + TIME_GAP_W < flow_info.flow_sink_time) {
                 is_update = 1;
             }
@@ -759,5 +761,6 @@ int collector(struct xdp_md *ctx) {
         events.perf_submit(ctx, &flow_info, sizeof(flow_info));
 
 DROP:
+    bpf_trace_printk("dropped pkt");
     return XDP_DROP;
 }

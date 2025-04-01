@@ -654,7 +654,7 @@ control Int_transit(inout headers_t hdr,
         // key = {}
         key = {
             // Need to find better way for this.
-             hdr.int_meta.instruction_mask_0811: exact;
+            hdr.ipv4.srcAddr: exact;
         }
         actions = {
             int_transit_params;
