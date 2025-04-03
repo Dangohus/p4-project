@@ -7,7 +7,7 @@ from libc.stdint cimport uintptr_t
 
 
 # change array len of sw_ids.. to .. tx_utilizes to match with max_int_hop in the collector
-cdef enum: __MAX_INT_HOP = 6
+cdef enum: __MAX_INT_HOP = 2
 _MAX_INT_HOP = __MAX_INT_HOP
 cdef struct Event:
     unsigned int   src_ip

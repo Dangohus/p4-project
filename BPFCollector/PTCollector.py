@@ -41,10 +41,10 @@ class PTCollector(object):
             ['src_ip', 'src_port', 'dst_ip', 'dst_port', 'ip_proto'])
         self.g_flow_hop_latency = Gauge('flow_hop_latency', 'per-hop latency of flow',
             ['src_ip', 'src_port', 'dst_ip', 'dst_port', 'ip_proto', 'sw_id'])
-        self.g_tx_utilize = Gauge('tx_utilize', 'tx link utilization',
-            ['sw_id', 'p_id'])
-        self.g_queue_occup = Gauge('queue_occup', 'queue occupancy',
-            ['sw_id', 'q_id'])
+        # self.g_tx_utilize = Gauge('tx_utilize', 'tx link utilization',
+        #     ['sw_id', 'p_id'])
+        # self.g_queue_occup = Gauge('queue_occup', 'queue occupancy',
+        #     ['sw_id', 'q_id'])
         # self.g_queue_congest = Gauge('queue_congest', 'queue congestion',
         #     ['sw_id', 'q_id'])
 
@@ -194,7 +194,7 @@ class PTCollector(object):
                             event.dst_port, event.ip_proto)
 
                 # delete all old one
-                if self.flow_paths.has_key(flow_id):
+                if flow_id in self.flow_paths:
                     for sw_id in self.flow_paths[flow_id]:
                         self.g_flow_hop_latency.remove(event.src_ip, event.dst_ip, \
                                                       event.src_port, event.dst_port,\
@@ -213,23 +213,23 @@ class PTCollector(object):
                                                event.ip_proto, event.sw_ids[i]))
 
 
-            if event.is_tx_utilize:
-                for i in range(0, event.num_INT_hop):
-                    if ((event.is_tx_utilize >> i) & 0x01):
-                        self.g_tx_utilize.labels(event.sw_ids[i],\
-                                                  event.e_port_ids[i]) \
-                                        .set_function(self.get_tx_utilize( \
-                                                  event.sw_ids[i], \
-                                                  event.e_port_ids[i]))
+            # if event.is_tx_utilize:
+            #     for i in range(0, event.num_INT_hop):
+            #         if ((event.is_tx_utilize >> i) & 0x01):
+            #             self.g_tx_utilize.labels(event.sw_ids[i],\
+            #                                       event.e_port_ids[i]) \
+            #                             .set_function(self.get_tx_utilize( \
+            #                                       event.sw_ids[i], \
+            #                                       event.e_port_ids[i]))
 
-            if event.is_queue_occup:
-                for i in range(0, event.num_INT_hop):
-                    if ((event.is_queue_occup >> i) & 0x01):
-                        self.g_queue_occup.labels(event.sw_ids[i],\
-                                                  event.queue_ids[i]) \
-                                        .set_function(self.get_queue_occup( \
-                                                  event.sw_ids[i], \
-                                                  event.queue_ids[i]))
+            # if event.is_queue_occup:
+            #     for i in range(0, event.num_INT_hop):
+            #         if ((event.is_queue_occup >> i) & 0x01):
+            #             self.g_queue_occup.labels(event.sw_ids[i],\
+            #                                       event.queue_ids[i]) \
+            #                             .set_function(self.get_queue_occup( \
+            #                                       event.sw_ids[i], \
+            #                                       event.queue_ids[i]))
 
             # if event.is_queue_congest:
             #     for i in range(0, event.num_INT_hop):
