@@ -100,7 +100,6 @@ class InDBCollector(object):
 
     def poll_events(self):
         self.bpf_collector.kprobe_poll()
-        print("abc")
 
     def open_events(self):
         def _process_event(ctx, data, size):

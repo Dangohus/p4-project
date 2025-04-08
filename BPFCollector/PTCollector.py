@@ -212,6 +212,7 @@ class PTCollector(object):
                                                event.src_port, event.dst_port, \
                                                event.ip_proto, event.sw_ids[i]))
 
+            # Commented out most unused code for out test setup.
 
             # if event.is_tx_utilize:
             #     for i in range(0, event.num_INT_hop):

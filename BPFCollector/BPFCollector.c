@@ -352,7 +352,7 @@ BPF_TABLE("lru_hash", struct queue_id_t, struct queue_info_t, tb_queue, 3000);
 
 int collector(struct xdp_md *ctx) {
 
-    bpf_trace_printk("recv pkt!AaAA \n");
+    bpf_trace_printk("recv pkt! \n");
 
     // return XDP_DROP;
 
@@ -405,10 +405,8 @@ int collector(struct xdp_md *ctx) {
     CURSOR_ADVANCE_NO_PARSE(cursor, remain_size, data_end);
 
     // CURSOR_ADVANCE_NO_PARSE(cursor, INT_SHIM_SIZE, data_end);
-    bpf_trace_printk("00");
     struct INT_shim_t *INT_shim;
     CURSOR_ADVANCE(INT_shim, cursor, sizeof(*INT_shim), data_end);
-    bpf_trace_printk("01");
     // struct INT_md_fix_t *INT_md_fix;
     struct INT_md_fix_v10_t *INT_md_fix;
     
@@ -422,6 +420,7 @@ int collector(struct xdp_md *ctx) {
     u8 INT_data_len = INT_shim->length - 3; // 3 is sizeof INT shim and md fix headers in words
     // should use this but is it slower?
     // u8 num_INT_hop = INT_data_len/INT_md_fix->hopMlen;
+    // Hard coding this to be two, since in our test setup we always have two hops.
     u8 num_INT_hop = 2; // max
     // if((u8)(INT_md_fix->hopMlen << 2) + INT_md_fix->hopMlen == INT_data_len)      num_INT_hop = 5;
     // else if((u8)(INT_md_fix->hopMlen << 2) == INT_data_len)                       num_INT_hop = 4;
@@ -441,7 +440,6 @@ int collector(struct xdp_md *ctx) {
     };
 
     u16 INT_ins = ntohs(INT_md_fix->ins);
-    bpf_trace_printk("%x", INT_ins);
     // Assume that sw_id is alway presented.
     if ((INT_ins >> 15) & 0x01 != 1) return XDP_DROP;
 
@@ -459,6 +457,10 @@ int collector(struct xdp_md *ctx) {
     for (u8 i = 0; i < MAX_INT_HOP; i++) {
         CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
         flow_info.sw_ids[i] = ntohl(*INT_data);
+
+        // Put most of this in comments, since it greatly increases the
+        // intruction size, and in our tests setup we always use the same
+        // instruction set.
 
         // if (is_in_e_port_ids) {
             // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
@@ -519,6 +521,7 @@ int collector(struct xdp_md *ctx) {
     flow_id.src_port = flow_info.src_port;
     flow_id.dst_port = flow_info.dst_port;
     flow_id.ip_proto = flow_info.ip_proto;
+
     struct flow_info_t *flow_info_p = tb_flow.lookup(&flow_id);
     if (unlikely(!flow_info_p)) {
 
@@ -546,7 +549,6 @@ int collector(struct xdp_md *ctx) {
     } else {
 
 #ifdef USE_INTERVAL
-        bpf_trace_printk("D");
         if (flow_info_p->flow_sink_time + TIME_GAP_W < flow_info.flow_sink_time) {
                 is_update = 1;
             }
@@ -621,6 +623,7 @@ int collector(struct xdp_md *ctx) {
         // flow_info.byte_cnt = flow_info_p->byte_cnt + ntohs(ip->tot_len);
     }
 
+    // Not chekcing is_update here, since we always want updates.
     // if (is_update)
     tb_flow.update(&flow_id, &flow_info);
 
@@ -748,8 +751,7 @@ int collector(struct xdp_md *ctx) {
         }
     }
 
-    bpf_trace_printk("%d, %d, %d" , flow_info.is_n_flow,flow_info.is_hop_latency,flow_info.is_queue_occup);
-    bpf_trace_printk("%d" , flow_info.is_tx_utilize);
+    // Hard coding this to be set. Not entirely sure why it is not always 1 anyways.
     flow_info.is_hop_latency = 1;
     // submit event info to user space
     if (unlikely(flow_info.is_n_flow |
@@ -762,6 +764,5 @@ int collector(struct xdp_md *ctx) {
         events.perf_submit(ctx, &flow_info, sizeof(flow_info));
 
 DROP:
-    bpf_trace_printk("dropped pkt");
     return XDP_DROP;
 }
