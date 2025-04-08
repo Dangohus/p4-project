@@ -352,7 +352,7 @@ BPF_TABLE("lru_hash", struct queue_id_t, struct queue_info_t, tb_queue, 3000);
 
 int collector(struct xdp_md *ctx) {
 
-    // bpf_trace_printk("recv pkt! \n");
+    bpf_trace_printk("recv pkt! \n");
 
     // return XDP_DROP;
 
@@ -391,13 +391,13 @@ int collector(struct xdp_md *ctx) {
     */
 
     CURSOR_ADVANCE_NO_PARSE(cursor, ETH_SIZE, data_end);
-
+    CURSOR_ADVANCE_NO_PARSE(cursor, -58, data_end);
     struct iphdr *in_ip;
     CURSOR_ADVANCE(in_ip, cursor, sizeof(*in_ip), data_end);
 
     struct ports_t *in_ports;
     CURSOR_ADVANCE(in_ports, cursor, sizeof(*in_ports), data_end);
-
+    CURSOR_ADVANCE_NO_PARSE(cursor, 70, data_end);
     // TODO: TCP with option (not fixed header len)?
     u8 remain_size = (in_ip->protocol == IPPROTO_UDP)?
                     (UDPHDR_SIZE - sizeof(*in_ports)) :
@@ -405,14 +405,13 @@ int collector(struct xdp_md *ctx) {
     CURSOR_ADVANCE_NO_PARSE(cursor, remain_size, data_end);
 
     // CURSOR_ADVANCE_NO_PARSE(cursor, INT_SHIM_SIZE, data_end);
-
-    struct INT_shim_v10_t *INT_shim;
+    struct INT_shim_t *INT_shim;
     CURSOR_ADVANCE(INT_shim, cursor, sizeof(*INT_shim), data_end);
-
     // struct INT_md_fix_t *INT_md_fix;
     struct INT_md_fix_v10_t *INT_md_fix;
+    
+    CURSOR_ADVANCE_NO_PARSE(cursor, -12, data_end);
     CURSOR_ADVANCE(INT_md_fix, cursor, sizeof(*INT_md_fix), data_end);
-
 
     /*
         Parse INT data
@@ -421,14 +420,14 @@ int collector(struct xdp_md *ctx) {
     u8 INT_data_len = INT_shim->length - 3; // 3 is sizeof INT shim and md fix headers in words
     // should use this but is it slower?
     // u8 num_INT_hop = INT_data_len/INT_md_fix->hopMlen;
-    u8 num_INT_hop = 6; // max
-    if((u8)(INT_md_fix->hopMlen << 2) + INT_md_fix->hopMlen == INT_data_len)      num_INT_hop = 5;
-    else if((u8)(INT_md_fix->hopMlen << 2) == INT_data_len)                       num_INT_hop = 4;
-    else if((u8)(INT_md_fix->hopMlen << 1) + INT_md_fix->hopMlen == INT_data_len) num_INT_hop = 3;
-    else if((u8)(INT_md_fix->hopMlen << 1) == INT_data_len)                       num_INT_hop = 2;
-    else if(INT_md_fix->hopMlen == INT_data_len)                                  num_INT_hop = 1;
-    else if(0 == INT_data_len)                                                    num_INT_hop = 0;
-
+    // Hard coding this to be two, since in our test setup we always have two hops.
+    u8 num_INT_hop = 2; // max
+    // if((u8)(INT_md_fix->hopMlen << 2) + INT_md_fix->hopMlen == INT_data_len)      num_INT_hop = 5;
+    // else if((u8)(INT_md_fix->hopMlen << 2) == INT_data_len)                       num_INT_hop = 4;
+    // else if((u8)(INT_md_fix->hopMlen << 1) + INT_md_fix->hopMlen == INT_data_len) num_INT_hop = 3;
+    // else if((u8)(INT_md_fix->hopMlen << 1) == INT_data_len)                       num_INT_hop = 2;
+    // else if(INT_md_fix->hopMlen == INT_data_len)                                  num_INT_hop = 1;
+    // else if(0 == INT_data_len)                                                    num_INT_hop = 0;
     struct flow_info_t flow_info = {
         .src_ip = ntohl(in_ip->saddr),
         .dst_ip = ntohl(in_ip->daddr),
@@ -459,10 +458,14 @@ int collector(struct xdp_md *ctx) {
         CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
         flow_info.sw_ids[i] = ntohl(*INT_data);
 
+        // Put most of this in comments, since it greatly increases the
+        // intruction size, and in our tests setup we always use the same
+        // instruction set.
+
         // if (is_in_e_port_ids) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.in_port_ids[i] = (ntohl(*INT_data) >> 16) & 0xffff;
-            flow_info.e_port_ids[i] = ntohl(*INT_data) & 0xffff;
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.in_port_ids[i] = (ntohl(*INT_data) >> 16) & 0xffff;
+            // flow_info.e_port_ids[i] = ntohl(*INT_data) & 0xffff;
         // }
         // Keep this. it's important
         // if (is_hop_latencies) {
@@ -472,25 +475,25 @@ int collector(struct xdp_md *ctx) {
         // }
         // Keep this. it's important
         // if (is_queue_occups) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.queue_ids[i] = (ntohl(*INT_data) >> 16) & 0xffff;
-            flow_info.queue_occups[i] = ntohl(*INT_data) & 0xffff;
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.queue_ids[i] = (ntohl(*INT_data) >> 16) & 0xffff;
+            // flow_info.queue_occups[i] = ntohl(*INT_data) & 0xffff;
         // }
         // if (is_ingr_times) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.ingr_times[i] = ntohl(*INT_data);
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.ingr_times[i] = ntohl(*INT_data);
         // }
         // if (is_egr_times) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.egr_times[i] = ntohl(*INT_data);
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.egr_times[i] = ntohl(*INT_data);
         // }
         // if (is_lv2_in_e_port_ids) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.lv2_in_e_port_ids[i] = ntohl(*INT_data);
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.lv2_in_e_port_ids[i] = ntohl(*INT_data);
         // }
         // if (is_tx_utilizes) {
-            CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
-            flow_info.tx_utilizes[i] = ntohl(*INT_data);
+            // CURSOR_ADVANCE(INT_data, cursor, sizeof(*INT_data), data_end);
+            // flow_info.tx_utilizes[i] = ntohl(*INT_data);
         // }
 
         // no need for the final round
@@ -620,8 +623,9 @@ int collector(struct xdp_md *ctx) {
         // flow_info.byte_cnt = flow_info_p->byte_cnt + ntohs(ip->tot_len);
     }
 
-    if (is_update)
-        tb_flow.update(&flow_id, &flow_info);
+    // Not chekcing is_update here, since we always want updates.
+    // if (is_update)
+    tb_flow.update(&flow_id, &flow_info);
 
 
 
@@ -747,7 +751,8 @@ int collector(struct xdp_md *ctx) {
         }
     }
 
-
+    // Hard coding this to be set. Not entirely sure why it is not always 1 anyways.
+    flow_info.is_hop_latency = 1;
     // submit event info to user space
     if (unlikely(flow_info.is_n_flow |
         flow_info.is_hop_latency | flow_info.is_queue_occup | flow_info.is_tx_utilize

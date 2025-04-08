@@ -20,7 +20,7 @@
     {
       "table": "EgressImpl.int_egress.int_transit.tb_int_transit",
       "match": {
-        "hdr.int_meta.instruction_mask_0811": 15
+        "hdr.ipv4.srcAddr": "10.0.1.1"
       },
       "action_name": "EgressImpl.int_egress.int_transit.int_transit_params",
       "action_params": {
@@ -38,7 +38,7 @@
         "src_mac": "00:00:00:03:00:00",
         "mon_server_mac": "00:00:00:00:22:32",
         "src_ip": "10.0.3.254",
-        "mon_server_ip": "10.0.223.2",
+        "mon_server_ip": "127.0.0.1",
         "mon_server_port": 12345
       }
     },
@@ -95,7 +95,7 @@
     {
       "table": "IngressImpl.table0_control.table0",
       "match": {
-        "hdr.ipv4.dstAddr": ["10.0.223.2", 4294967295]
+        "hdr.ipv4.dstAddr": ["127.0.0.1", 4294967295]
       },
       "priority" : 2,
       "action_name": "IngressImpl.table0_control.set_egress_port",
