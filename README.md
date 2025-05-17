@@ -73,7 +73,7 @@ pip3 install bcc
 pip3 install numba
 pip3 install pytest
 
-cd /BPFCollector
+cd BPFCollector
 sudo python3 -m pytest 
 ```
 ## Installing Prometheus
