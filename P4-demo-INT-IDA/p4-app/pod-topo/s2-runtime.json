@@ -54,7 +54,7 @@
       "priority" : 2,
       "action_name": "IngressImpl.table0_control.set_egress_port",
       "action_params": {
-        "dstAddr": "00:00:00:00:02:02",
+        "dstAddr": "08:00:00:00:02:22",
         "port": 1
       }
     },
