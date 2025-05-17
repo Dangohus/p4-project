@@ -113,6 +113,8 @@ sudo nano /etc/prometheus/prometheus.yml
 Append the following job the the file (it is important to use tab and not space)
 ```
   - job_name: p4switch
+    scrape_interval: 0s100ms
+    scrape_timeout: 0s100ms
     static_configs:
     - targets: ['localhost:8000']
 ```
