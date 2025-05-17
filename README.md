@@ -23,7 +23,7 @@ Install cpio and gedit prior to kernel rebuild
 Using the following guide: https://massoudasadiblog.blogspot.com/2024/07/ebpf-on-wsl2-kernel-version-6x-ubuntu.html
 Do steps 0 through 12.
 
-Skip step 13 and test if it works with step 14 in folder `p4-project/test xdp`, then continue the last steps of the guide.
+Skip step 13 and test if the installation works by continuing from step 14 in folder `p4-project/test xdp`, then continue the last steps of the guide.
 
 #### Troubleshooting dissable large recieve offload
 Step 16 may fail with "operation not supported". Then use the following
